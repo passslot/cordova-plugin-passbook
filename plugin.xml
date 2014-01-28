@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+           id="com.passslot.cordova.plugin.passbook"
+      version="0.1.0">
+
+    <name>Passbook</name>
+    <description>This plugin allows you to add passes to Passbook</description>
+    <author>PassSlot.com</author>
+    <license>Apache 2.0</license>
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
+
+    <!-- ios -->
+    <platform name="ios">
+
+        <config-file target="config.xml" parent="/*">
+            <feature name="Passbook">
+                <param name="ios-package" value="CDVPassbook"/>
+            </feature>
+        </config-file>
+
+        <js-module src="www/passbook.js" name="passbook">
+            <clobbers target="Passbook" />
+        </js-module>
+
+        <header-file src="src/ios/CDVPassbook.h" />
+        <source-file src="src/ios/CDVPassbook.m" />
+    
+        <framework src="PassKit.framework" />
+
+    </platform>
+
+</plugin>
