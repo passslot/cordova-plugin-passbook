@@ -1,6 +1,5 @@
 #import "CDVPassbook.h"
 #import <Cordova/CDV.h>
-#import <PassKit/PassKit.h>
 
 @implementation CDVPassbook
 
@@ -20,6 +19,43 @@
     [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
 }
 
+- (void)isPassInLibrary:(CDVInvokedUrlCommand*)command
+{
+
+    NSError *error = nil;
+    NSString *filePath=[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:[command argumentAtIndex:0]];
+    NSData *data = [NSData dataWithContentsOfFile:filePath];
+    PKPass *pass = [[PKPass alloc] initWithData:data error:&error];
+    PKPassLibrary* passLib = [[PKPassLibrary alloc] init];
+    CDVPluginResult *commandResult;
+
+    if(!pass) {
+        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+        [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+    }else{
+        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[passLib containsPass:pass]];
+        [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+
+    }
+
+ }
+
+
+- (void)openPass:(CDVInvokedUrlCommand*)command
+{
+    //[command argumentAtIndex:0] 
+    NSString *filePath=[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:[command argumentAtIndex:0]];
+    NSData *data = [NSData dataWithContentsOfFile:filePath];
+
+    [self tryAddPass:data success:^{
+        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+    } error:^(NSError *error) {//error.localizedDescription
+        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
+        [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+    }];
+
+}
 - (void)downloadPass:(CDVInvokedUrlCommand*)command
 {
     if(!PKPassLibrary.isPassLibraryAvailable) {
@@ -56,7 +92,8 @@
     }
     
     PKAddPassesViewController *c = [[PKAddPassesViewController alloc] initWithPass:pass];
-    
+    [c setDelegate:(id)self];
+
     [self.viewController presentViewController:c animated:YES completion:^{
         if(successBlock) {
             successBlock();
@@ -72,7 +109,14 @@
     
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
         [self tryAddPass:data success:successBlock error:errorBlock];
+
     }];
 }
 
+- (void)addPassesViewControllerDidFinish:(PKAddPassesViewController *)controller{
+
+    [self.commandDelegate evalJs:[NSString stringWithFormat:@"cordova.fireWindowEvent('addPassesViewControllerDidFinish'); "]];
+    [controller dismissViewControllerAnimated:YES completion:nil];
+
+}
 @end
