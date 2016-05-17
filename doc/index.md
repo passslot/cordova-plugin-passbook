@@ -46,17 +46,17 @@ Returns if Passbook is available on the current device to the `resultCallback` c
 ## Passbook.downloadPass
 
 Downloads a pass from a the provided URL and shows it to the user.
-When the pass was sucessfully downloaded and shown to the user, the `successCallback` callback executes. If there is an error, the `errorCallback` callback executes with an error string as the parameter
+When the pass was successfully downloaded and was shown to the user, and the user either canceld or added the pass, the `passCallback` callback executes. If there is an error, the `errorCallback` callback executes with an error string as the parameter
 
     Passbook.downloadPass(url,
-                         [successCallback],
+                         [passCallback],
                          [errorCallback]);
 
 ### Parameters
 
 - __url__: The URL of the pass that should be downloaded.
 
-- __successCallback__: (Optional) The callback that executes when the pass is shown to the user.
+- __passCallback__: (Optional) The callback that executes when the pass is shown to the user. Returns the downloaded pass (passTypeIdentifier, serialNumber, passURL) and if it was added to Passbook.
 
 - __errorCallback__: (Optional) The callback that executes if an error occurs, e.g if Passbook is not available, the URL is invalid or no valid pass was found at the given URL.
 
@@ -64,8 +64,9 @@ When the pass was sucessfully downloaded and shown to the user, the `successCall
 ### Example
 
     // onSuccess Callback
-    function onSuccess() {
+    function onSuccess(pass, added) {
         console.log('Pass shown to the user');
+        console.log(pass, added);
     }
 
     // onError Callback receives a string with the error message
@@ -77,3 +78,36 @@ When the pass was sucessfully downloaded and shown to the user, the `successCall
     Passbook.downloadPass('https://d.pslot.io/cQY2f', onSuccess, onError);
 
 
+## Passbook.addPass
+
+Add a pass from a the provided local file and shows it to the user.
+When the pass was successfully shown to the user, and the user either canceled or added the pass, the `passCallback` callback executes. If there is an error, the `errorCallback` callback executes with an error string as the parameter
+
+    Passbook.addPass(file,
+                         [passCallback],
+                         [errorCallback]);
+
+### Parameters
+
+- __file__: The file of the pass that should be downloaded. (e.g. file:///..../sample.pkpass)
+
+- __passCallback__: (Optional) The callback that executes when the pass is shown to the user. Returns the local pass (passTypeIdentifier, serialNumber, passURL) and if it was added to Passbook.
+
+- __errorCallback__: (Optional) The callback that executes if an error occurs, e.g if Passbook is not available, the URL is invalid or no valid pass was found at the given URL.
+
+
+### Example
+
+    // onSuccess Callback
+    function onSuccess(pass, added) {
+        console.log('Pass shown to the user');
+        console.log(pass, added);
+    }
+
+    // onError Callback receives a string with the error message
+    //
+    function onError(error) {
+    	alert('Could now show pass: ' + error);
+    }
+
+    Passbook.addPass(cordova.file.applicationDirectory + 'sample.pkpass', onSuccess, onError);
