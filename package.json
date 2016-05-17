@@ -1,0 +1,31 @@
+{
+  "name": "cordova-plugin-passbook",
+  "version": "0.2.0",
+  "description": "This plugin allows you to add passes to Passbook",
+  "cordova": {
+    "id": "com.passslot.cordova.plugin.passbook",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/passslot/cordova-plugin-passbook.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
+  "author": "PassSlot",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/passslot/cordova-plugin-passbook/issues"
+  },
+  "homepage": "https://github.com/passslot/cordova-plugin-passbook#readme"
+}
