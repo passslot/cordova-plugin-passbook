@@ -74,7 +74,7 @@
 
 - (void)downloadPass:(NSURL*) url success:(void (^)(void))successBlock error:(void (^)(NSError *error))errorBlock
 {
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url cachePolicy:NSURLCacheStorageNotAllowed timeoutInterval:20.0];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20.0];
     // Fake User-Agent to be recognized as Passbook app, so that we directly get the pkpass file (when possible)
     [request addValue:@"Passbook/1.0 CFNetwork/672.0.2 Darwin/14.0.0" forHTTPHeaderField:@"User-Agent"];
     
