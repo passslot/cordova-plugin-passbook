@@ -6,6 +6,10 @@ This plugin provides support for showing Passbook passs to your users and allows
 
 ## Installation
 
+    cordova plugin add cordova-plugin-passbook
+    
+Or the latest (unstable) version:
+
     cordova plugin add https://github.com/passslot/cordova-plugin-passbook
 
 ## Supported Platforms
