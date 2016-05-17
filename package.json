@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-passbook",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "This plugin allows you to add passes to Passbook",
   "cordova": {
     "id": "com.passslot.cordova.plugin.passbook",
