@@ -56,12 +56,20 @@
     }
     
     PKAddPassesViewController *c = [[PKAddPassesViewController alloc] initWithPass:pass];
-    
-    [self.viewController presentViewController:c animated:YES completion:^{
+   
+    [[self getTopMostViewController] presentViewController:c animated:YES completion:^{
         if(successBlock) {
             successBlock();
         }
     }];
+}
+
+- (UIViewController*) getTopMostViewController {
+    UIViewController *presentingViewController = [[[UIApplication sharedApplication] delegate] window].rootViewController;
+    while (presentingViewController.presentedViewController != nil) {
+        presentingViewController = presentingViewController.presentedViewController;
+    }
+    return presentingViewController;
 }
 
 - (void)downloadPass:(NSURL*) url success:(void (^)(void))successBlock error:(void (^)(NSError *error))errorBlock
