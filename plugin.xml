@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-           id="com.passslot.cordova.plugin.passbook"
+           id="cordova-plugin-passbook"
       version="0.2.1">
 
     <name>Passbook</name>
