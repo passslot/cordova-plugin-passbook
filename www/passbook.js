@@ -32,17 +32,17 @@ passbook.available = function (resultCallback) {
 };
 /**
  *
- * @param {string} url
+ * @param {Object}  url:String | { url:String, headers?:Object }
  * @param {Function} passCallback
  * @param {Function} errorCallback
  */
-passbook.downloadPass = function (url, passCallback, errorCallback) {
+passbook.downloadPass = function (callData, passCallback, errorCallback) {
     exec(function (result) {
         if (typeof(passCallback) === 'function') {
             var pass = result.pass;
             passCallback(new Pass(pass.passTypeIdentifier, pass.serialNumber, pass.passURL), result.added);
         }
-    }, errorCallback, "Passbook", "downloadPass", [url]);
+    }, errorCallback, "Passbook", "downloadPass", [callData]);
 };
 
 /**

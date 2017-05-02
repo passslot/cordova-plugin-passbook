@@ -12,7 +12,10 @@ typedef void (^AddPassResultBlock)(PKPass *pass, BOOL added);
 - (BOOL)ensureAvailability:(CDVInvokedUrlCommand*)command;
 - (void)sendPassResult:(PKPass*)pass added:(BOOL)added command:(CDVInvokedUrlCommand*)command;
 - (void)sendError:(NSError*)error command:(CDVInvokedUrlCommand*)command;
-- (void)downloadPass:(NSURL*) url success:(AddPassResultBlock)successBlock error:(void (^)(NSError *error))errorBlock;
+- (void)downloadPass:(NSURL*) url
+             headers:(NSDictionary * _Nullable)headers
+             success:(AddPassResultBlock)successBlock
+               error:(void (^)(NSError *error))errorBlock;
 - (void)tryAddPass:(NSData*)data success:(AddPassResultBlock)successBlock error:(void (^)(NSError *error))errorBlock;
 - (UIViewController*) getTopMostViewController;
 
@@ -26,7 +29,7 @@ typedef void (^AddPassResultBlock)(PKPass *pass, BOOL added);
 - (BOOL)shouldOverrideLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType
 {
     if(PKPassLibrary.isPassLibraryAvailable && [request.URL.pathExtension isEqualToString:@"pkpass"]) {
-        [self downloadPass:request.URL success:nil error:nil];
+        [self downloadPass:request.URL headers:nil success:nil error:nil];
         return YES;
     }
     
@@ -54,14 +57,26 @@ typedef void (^AddPassResultBlock)(PKPass *pass, BOOL added);
         return;
     }
     
-    NSString *urlStr = [command argumentAtIndex:0];
-    NSURL *url = [NSURL URLWithString:urlStr];
+    id callData = [command argumentAtIndex:0];
+    
+    NSURL *url;
+    NSDictionary *headers;
+    
+    if ([callData isKindOfClass:[NSDictionary class]]) {
+        
+        url     = [NSURL URLWithString:callData[@"url"] ];
+        headers = callData[@"headers"];
+    }
+    else { // let assume that is a string
+        NSString *urlStr = [command argumentAtIndex:0];
+        url = [NSURL URLWithString:urlStr];
+    }
     if(!url) {
         CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_MALFORMED_URL_EXCEPTION];
         [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
         return;
     }
-    [self downloadPass:url success:^(PKPass *pass, BOOL added){
+    [self downloadPass:url headers:headers success:^(PKPass *pass, BOOL added){
         [self sendPassResult:pass added:added command:command];
     } error:^(NSError *error) {
         [self sendError:error command:command];
@@ -194,11 +209,19 @@ typedef void (^AddPassResultBlock)(PKPass *pass, BOOL added);
     return presentingViewController;
 }
 
-- (void)downloadPass:(NSURL*) url success:(AddPassResultBlock)successBlock error:(void (^)(NSError *error))errorBlock
+- (void)downloadPass:(NSURL*) url headers:(NSDictionary * _Nullable)headers success:(AddPassResultBlock)successBlock error:(void (^)(NSError *error))errorBlock
 {
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:20.0];
     // Fake User-Agent to be recognized as Passbook app, so that we directly get the pkpass file (when possible)
     [request addValue:@"Passbook/1.0 CFNetwork/672.0.2 Darwin/14.0.0" forHTTPHeaderField:@"User-Agent"];
+    if( headers != nil ) {
+        
+        for (NSString* key in headers) {
+            id value = headers[key];
+            [request addValue:value forHTTPHeaderField:key];
+        }
+ 
+    }
     
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
         [self tryAddPass:data success:successBlock error:errorBlock];
