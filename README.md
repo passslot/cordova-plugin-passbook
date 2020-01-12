@@ -1,4 +1,4 @@
-# com.passslot.cordova.plugin.passbook
+# cordova-plugin-passbook
 
 This plugin provides support for showing Passbook passs to your users and allows them to add it to their native Wallet (regardless of how you create your passes, whether you do it on your own or using any third-party services like [PassSlot](http://www.PassSlot.com))
 
@@ -14,9 +14,7 @@ Or the latest (unstable) version:
 
 ## Supported Platforms
 
-
 - iOS
-- ~~Android~~ (coming soon)
 
 ## Example
 
@@ -25,9 +23,7 @@ Or the latest (unstable) version:
 ```javascript
     Passbook.downloadPass('https://d.pslot.io/cQY2f', function (pass, added) {
         console.log(pass, added);
-        if (added) {
-            Passbook.openPass(pass);
-        } else {
+        if (!added) {
             alert('Please add the pass');
         }
     }, function (error) {
@@ -46,10 +42,37 @@ Or the latest (unstable) version:
 
     Passbook.downloadPass(callData, function (pass, added) {
         console.log(pass, added);
-        if (added) {
-            Passbook.openPass(pass);
-        } else {
+        if (!added) {
             alert('Please add the pass');
+        }
+    }, function (error) {
+        console.error(error);
+    });
+```
+
+### Multiple passes
+
+```javascript
+ Passbook.downloadPasses(['https://d.pslot.io/cQY2f', 'https://d.pslot.io/AeY3D'], function (passes, added) {
+        console.log(passes, added);
+        if (!added) {
+            alert('Please add the passes');
+        }
+    }, function (error) {
+        console.error(error);
+    });
+```
+
+### Multiple passes with headers
+
+```javascript
+ Passbook.downloadPasses({
+    urls: ['https://d.pslot.io/cQY2f', 'https://d.pslot.io/AeY3D'],
+    headers: {authorization: "Bearer <token>"}
+ }, function (passes, added) {
+        console.log(passes, added);
+        if (!added) {
+            alert('Please add the passes');
         }
     }, function (error) {
         console.error(error);
