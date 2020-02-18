@@ -2,10 +2,10 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="cordova-plugin-passbook"
-      version="0.2.1">
+      version="0.3.0">
 
     <name>Passbook</name>
-    <description>This plugin allows you to add passes to Passbook</description>
+    <description>This plugin allows you to add passes to iOS Wallet</description>
     <author>PassSlot.com</author>
     <license>Apache 2.0</license>
     <engines>
@@ -31,5 +31,16 @@
         <framework src="PassKit.framework" />
 
     </platform>
-
+    
+    <config-file target="*-Debug.plist" parent="com.apple.developer.pass-type-identifiers">
+        <array>
+            <string>$(TeamIdentifierPrefix)*</string>
+        </array>
+    </config-file>
+    <config-file target="*-Release.plist" parent="com.apple.developer.pass-type-identifiers">
+        <array>
+            <string>$(TeamIdentifierPrefix)*</string>
+        </array>
+    </config-file>
+    
 </plugin>

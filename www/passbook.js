@@ -16,6 +16,17 @@ var Pass = function (passTypeIdentifier, serialNumber, passURL) {
     this.passURL = passURL || null;
 };
 
+function toPass(pass) {
+    return new Pass(pass.passTypeIdentifier, pass.serialNumber, pass.passURL)
+}
+
+function toPassArray(passes) {
+    var result = [];
+    for (var index = 0; index < passes.length; index++) {
+        result.push(toPass(passes[index]));
+    }
+    return result;
+}
 
 Pass.prototype.open = function () {
     passbook.openPass(this.passURL, null, null);
@@ -40,14 +51,30 @@ passbook.downloadPass = function (callData, passCallback, errorCallback) {
     exec(function (result) {
         if (typeof(passCallback) === 'function') {
             var pass = result.pass;
-            passCallback(new Pass(pass.passTypeIdentifier, pass.serialNumber, pass.passURL), result.added);
+            passCallback(toPass(pass), result.added);
         }
     }, errorCallback, "Passbook", "downloadPass", [callData]);
 };
 
 /**
  *
- * @param file Local File URL, e.g. file:///path/pass.pkpass
+ * @param {(string[]|{urls: string[], headers?: Object})}  callData
+ * @param {Function} passCallback
+ * @param {Function} errorCallback
+ */
+passbook.downloadPasses = function (callData, passCallback, errorCallback) {
+    exec(function (result) {
+        if (typeof(passCallback) === 'function') {
+            var passes = result.passes;
+            passCallback(toPassArray(passes), result.added);
+        }
+    }, errorCallback, "Passbook", "downloadPasses", [callData]);
+};
+               
+
+/**
+ *
+ * @param {string} file Local File URL, e.g. file:///path/pass.pkpass
  * @param {Function} passCallback
  * @param {Function} errorCallback
  */
@@ -55,11 +82,26 @@ passbook.addPass = function (file, passCallback, errorCallback) {
     exec(function (result) {
         if (typeof(passCallback) === 'function') {
             var pass = result.pass;
-            passCallback(new Pass(pass.passTypeIdentifier, pass.serialNumber, pass.passURL), result.added);
+            passCallback(toPass(pass), result.added);
         }
     }, errorCallback, "Passbook", "addPass", [file]);
 };
 
+/**
+ *
+ * @param {string[]} files array of Local File URLs, e.g. file:///path/pass.pkpass
+ * @param {Function} passCallback
+ * @param {Function} errorCallback
+ */
+passbook.addPasses = function (file, passCallback, errorCallback) {
+    exec(function (result) {
+        if (typeof(passCallback) === 'function') {
+            var passes = result.passes;
+            passCallback(toPassArray(passes), result.added);
+        }
+    }, errorCallback, "Passbook", "addPasses", [file]);
+};
+               
 /**
  *
  * @param {Pass|string} passOrUrl
